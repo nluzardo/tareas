@@ -1,0 +1,9 @@
+[ubuntu]
+ub1 ansible_host=192.168.1.12
+
+[centos]
+centos1 ansible_host=192.168.1.10
+
+[linux:children]
+ubuntu
+centos

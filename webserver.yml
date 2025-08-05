@@ -1,0 +1,64 @@
+---
+- hosts: all
+  user: sysadmin
+  become: yes
+
+  tasks:
+
+  - name: Ensure httpd package is present
+    yum:
+      pkg: httpd
+      state: installed
+    when: ansible_facts['os_family'] == "RedHat"
+    notify: reiniciar httpd
+
+  - name: http en ubuntu
+    apt:
+      pkg: apache2
+      state: present
+    when: ansible_facts['os_family'] == "Debian"
+    notify: reiniciar apache2
+
+  - name: asegurar archivo index.html
+    copy:
+     src: ./files/index.html
+     dest: /var/www/html/index.html
+
+  - name: habilitar firewall firewalld
+    ansible.posix.firewalld:
+      service: http
+      state: enabled
+      permanent: true
+      immediate: true
+      offline: true
+    when: ansible_facts['os_family'] == "RedHat"
+
+  - name: habilitar puerto 22 ufw
+    community.general.ufw:
+      rule: allow
+      state: enable
+      port: ssh
+      proto: tcp
+    when: ansible_facts['os_family'] == "Redhat"
+
+  - name: habilitar firewall ufw
+    community.general.ufw:
+      rule: allow
+      state: enabled
+      port: 80
+      proto: tcp
+    when: ansible_facts['os_family'] == "Debian"
+
+  handlers:
+    - name: reiniciar httpd
+      service:
+        name: httpd
+        state: restarted
+      when: ansible_facts['os_family'] == "RedHat"
+
+    - name: reiniciar apache2
+      service:
+        name: apache2
+        state: restarted
+      when: ansible_facts['os_family'] == "Debian"
+...

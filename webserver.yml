@@ -6,20 +6,12 @@
   tasks:
 
   - name: Ensure httpd package is present
-    yum:
-      pkg: httpd
-      state: installed
-    when: ansible_facts['os_family'] == "RedHat"
-    notify: reiniciar httpd
+    ansible.builtin.package:
+      name: "{{ apache_service }}"
+      state: lastest
+    notify: reiniciar webserver
 
-  - name: http en ubuntu
-    apt:
-      pkg: apache2
-      state: present
-    when: ansible_facts['os_family'] == "Debian"
-    notify: reiniciar apache2
-
-  - name: asegurar archivo index.html
+  - name: Asegurar archivo index.html
     copy:
      src: ./files/index.html
      dest: /var/www/html/index.html
@@ -50,15 +42,8 @@
     when: ansible_facts['os_family'] == "Debian"
 
   handlers:
-    - name: reiniciar httpd
+    - name: reiniciar webserver
       service:
-        name: httpd
+        name: "{{ apache_service }}"
         state: restarted
-      when: ansible_facts['os_family'] == "RedHat"
-
-    - name: reiniciar apache2
-      service:
-        name: apache2
-        state: restarted
-      when: ansible_facts['os_family'] == "Debian"
 ...

@@ -5,13 +5,14 @@ centos1 ansible_host=192.168.1.10
 ub1
 [ubuntu:vars]
 ssh_service=ssh
-
+apache_service=apache2
 
 [centos]
 centos1
 
 [centos:vars]
 ssh_service=sshd
+apache_service=httpd
 
 [linux:children]
 ubuntu

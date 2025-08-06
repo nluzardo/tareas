@@ -8,7 +8,7 @@
   - name: Ensure httpd package is present
     ansible.builtin.package:
       name: "{{ apache_service }}"
-      state: lastest
+      state: latest
     notify: reiniciar webserver
 
   - name: Asegurar archivo index.html
@@ -16,30 +16,19 @@
      src: ./files/index.html
      dest: /var/www/html/index.html
 
-  - name: habilitar firewall firewalld
-    ansible.posix.firewalld:
-      service: http
-      state: enabled
-      permanent: true
-      immediate: true
-      offline: true
-    when: ansible_facts['os_family'] == "RedHat"
+  - name: tarea firewall centos
+    ansible.builtin.include_tasks:
+      file: fwd.yml
+    loop:
+      - ssh
+      - http
 
-  - name: habilitar puerto 22 ufw
-    community.general.ufw:
-      rule: allow
-      state: enable
-      port: ssh
-      proto: tcp
-    when: ansible_facts['os_family'] == "Redhat"
-
-  - name: habilitar firewall ufw
-    community.general.ufw:
-      rule: allow
-      state: enabled
-      port: 80
-      proto: tcp
-    when: ansible_facts['os_family'] == "Debian"
+  - name: tarea firewall ubuntu
+    ansible.builtin.include_tasks:
+      file: ufw.yml
+    loop:
+      - ssh
+      - http
 
   handlers:
     - name: reiniciar webserver

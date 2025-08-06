@@ -4,25 +4,15 @@
   become: yes
   gather_facts: no
   tasks:
-   - name: deshabilitar usuario root para login
+   - name: Aplico medida de seguridad ssh
      ansible.builtin.lineinfile:
        path: /etc/ssh/sshd_config
-       regexp: '#PermitRootLogin '
-       line: PermitRootLogin no
-     notify: Reinicio ssh
-
-   - name: Deshabilitar inicio de sesion basado en passwd
-     ansible.builtin.lineinfile:
-       path: /etc/ssh/sshd_config
-       regexp: '#AuthenticationMethods'
-       line: AuthenticationMethods publickey
-     notify: Reinicio ssh
-
-   - name: habilitar inicio de sesion con llave publica
-     ansible.builtin.lineinfile:
-       path: /etc/ssh/sshd_config
-       regexp: '#PubkeyAuthentication '
-       line: PubkeyAuthentication yes
+       regexp: "{{ item.abuscar }}"
+       line: " {{ item.reemplazo }} "
+     loop:
+       - { abuscar: '#PermitRootLogin ', reemplazo: 'PermitRootLogin no' }
+       - { abuscar: '#AuthenticationMethods ', reemplazo: 'Authenticationmethods publickey' }
+       - { abuscar: '#PubkeyAuthentication ', reemplazo: 'PubkeyAuthentication yes' }
      notify: Reinicio ssh
 
   handlers:
